@@ -38,7 +38,7 @@ import java.util.concurrent.Executors
 @SuppressLint("MissingPermission")
 class SpeechRecognizerUtils @RequiresPermission(Manifest.permission.RECORD_AUDIO) constructor(
     private val language: String = LANGUAGE_ENGLISH,
-    @AudioInputValue private val audioInputType: Int = AUDIO_TYPE_SYSTEM
+    @AudioInputValue private val audioInputType: Int = AUDIO_TYPE_MICROPHONE
 ) {
 
     companion object {
