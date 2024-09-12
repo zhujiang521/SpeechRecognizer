@@ -9,9 +9,14 @@ import com.microsoft.cognitiveservices.speech.SpeechConfig
 import com.microsoft.cognitiveservices.speech.SpeechRecognitionEventArgs
 import com.microsoft.cognitiveservices.speech.SpeechRecognizer
 import com.microsoft.cognitiveservices.speech.audio.AudioConfig
+import com.microsoft.cognitiveservices.speech.audio.PullAudioInputStreamCallback
 import com.zui.translator.model.SpeechModel
 import com.zui.translator.network.TranslatorText
+import com.zui.translator.stream.AUDIO_TYPE_MICROPHONE
+import com.zui.translator.stream.AUDIO_TYPE_SYSTEM
+import com.zui.translator.stream.AudioInputValue
 import com.zui.translator.stream.MicrophoneStream
+import com.zui.translator.stream.createAudioInputStream
 import com.zui.translator.utils.LANGUAGE_CHINESE
 import com.zui.translator.utils.LANGUAGE_ENGLISH
 import com.zui.translator.utils.SPEECH_REGION
@@ -30,8 +35,10 @@ import java.util.concurrent.Executors
  * 下面是对应的语言代码，可以去对应网站进行查询
  * https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=stt
  */
+@SuppressLint("MissingPermission")
 class SpeechRecognizerUtils @RequiresPermission(Manifest.permission.RECORD_AUDIO) constructor(
-    private val language: String = LANGUAGE_ENGLISH
+    private val language: String = LANGUAGE_ENGLISH,
+    @AudioInputValue private val audioInputType: Int = AUDIO_TYPE_SYSTEM
 ) {
 
     companion object {
@@ -42,7 +49,7 @@ class SpeechRecognizerUtils @RequiresPermission(Manifest.permission.RECORD_AUDIO
     private val executorService = Executors.newCachedThreadPool()
     private var speechConfig: SpeechConfig? = null
     private var sourceLanguageConfig: SourceLanguageConfig? = null
-    private var microphoneStream: MicrophoneStream? = null
+    private var inputStream: PullAudioInputStreamCallback? = null
     private var audioConfig: AudioConfig? = null
     private val translateRequest = TranslatorText()
     private val speechFlow: Flow<Triple<Any, SpeechRecognitionEventArgs, Boolean>>
@@ -64,8 +71,8 @@ class SpeechRecognizerUtils @RequiresPermission(Manifest.permission.RECORD_AUDIO
         speechConfig = SpeechConfig.fromSubscription(SPEECH_SUBSCRIPTION_KEY, SPEECH_REGION)
         sourceLanguageConfig = SourceLanguageConfig.fromLanguage(language)
         destroyMicrophoneStream() // in case it was previously initialized
-        microphoneStream = MicrophoneStream()
-        audioConfig = AudioConfig.fromStreamInput(microphoneStream)
+        inputStream = createAudioInputStream(audioInputType)
+        audioConfig = AudioConfig.fromStreamInput(inputStream)
         speechRecognizer = SpeechRecognizer(
             speechConfig,
             sourceLanguageConfig,
@@ -166,10 +173,7 @@ class SpeechRecognizerUtils @RequiresPermission(Manifest.permission.RECORD_AUDIO
      */
     private fun destroyMicrophoneStream() {
         synchronized(this) {
-            if (microphoneStream != null) {
-                microphoneStream?.close()
-                microphoneStream = null
-            }
+            inputStream?.close()
         }
     }
 

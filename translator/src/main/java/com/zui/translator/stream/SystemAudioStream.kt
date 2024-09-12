@@ -5,6 +5,7 @@
 package com.zui.translator.stream
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
@@ -17,7 +18,7 @@ import com.microsoft.cognitiveservices.speech.audio.PullAudioInputStreamCallback
  * to be consumed by the Speech SDK.
  * It configures the microphone with 16 kHz sample rate, 16 bit samples, mono (single-channel).
  */
-class MicrophoneStream @RequiresPermission(Manifest.permission.RECORD_AUDIO) constructor() :
+class SystemAudioStream @RequiresPermission(Manifest.permission.CAPTURE_AUDIO_OUTPUT) constructor() :
     PullAudioInputStreamCallback() {
     val format: AudioStreamFormat =
         AudioStreamFormat.getWaveFormatPCM(SAMPLE_RATE.toLong(), 16.toShort(), 1.toShort())
@@ -40,7 +41,8 @@ class MicrophoneStream @RequiresPermission(Manifest.permission.RECORD_AUDIO) con
         this.recorder = null
     }
 
-    @RequiresPermission(Manifest.permission.RECORD_AUDIO)
+    @SuppressLint("WrongConstant")
+    @RequiresPermission(Manifest.permission.CAPTURE_AUDIO_OUTPUT)
     private fun initMic() {
         // Note: currently, the Speech SDK support 16 kHz sample rate, 16 bit samples, mono (single-channel) only.
         val af = AudioFormat.Builder()
@@ -50,7 +52,7 @@ class MicrophoneStream @RequiresPermission(Manifest.permission.RECORD_AUDIO) con
             .build()
 
         this.recorder = AudioRecord.Builder()
-            .setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION)
+            .setAudioSource(MediaRecorder.AudioSource.REMOTE_SUBMIX)
             .setAudioFormat(af)
             .build()
 
@@ -60,9 +62,9 @@ class MicrophoneStream @RequiresPermission(Manifest.permission.RECORD_AUDIO) con
     companion object {
         private const val SAMPLE_RATE = 16000
 
-        @RequiresPermission(Manifest.permission.RECORD_AUDIO)
-        fun create(): MicrophoneStream {
-            return MicrophoneStream()
+        @RequiresPermission(Manifest.permission.CAPTURE_AUDIO_OUTPUT)
+        fun create(): SystemAudioStream {
+            return SystemAudioStream()
         }
     }
 }
