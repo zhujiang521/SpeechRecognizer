@@ -84,6 +84,7 @@ class TranslatorText {
         from: String = LANGUAGE_ENGLISH,
         vararg toTranslations: String
     ): Result<TranslatorModel> {
+        translateUrl = "translate?api-version=3.0"
         translateUrl = "${translateUrl}&from=${from}"
         toTranslations.forEach {
             translateUrl = "${translateUrl}&to=${it}"

@@ -33,8 +33,6 @@ class MainActivity : ComponentActivity() {
 
     private val mainViewModel by viewModels<MainViewModel>()
 
-    @SuppressLint("MissingPermission")
-    private val speechRecognizerUtils = SpeechRecognizerUtils(LANGUAGE_CHINESE)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -78,7 +76,7 @@ class MainActivity : ComponentActivity() {
                 Text("Start Recognizing")
             }
             Button(onClick = {
-                speechRecognizerUtils.stopRecognizer()
+                mainViewModel.speechRecognizerUtils.stopRecognizer()
             }) {
                 Text("Stop Recognizing")
             }
@@ -87,7 +85,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        speechRecognizerUtils.onDestroy()
+        mainViewModel.speechRecognizerUtils.onDestroy()
     }
 
     private fun requestPermission() {

@@ -87,6 +87,7 @@ class SpeechRecognizerUtils @RequiresPermission(Manifest.permission.RECORD_AUDIO
      * 使用executorService来确保异步执行语音识别的启动操作
      */
     private fun startRealRecognizing() {
+        Log.w(TAG, "startRealRecognizing: $audioInputType")
         speechRecognizer?.recognizing?.addEventListener { sender, e ->
             coroutineScope.launch {
                 _speechFlow.emit(Triple(sender, e, false))

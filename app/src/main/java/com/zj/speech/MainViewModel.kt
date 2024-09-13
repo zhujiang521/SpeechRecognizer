@@ -16,7 +16,7 @@ class MainViewModel : ViewModel() {
         get() = _speechFlow
     private val _speechFlow by lazy { MutableSharedFlow<SpeechModel>() }
     @SuppressLint("MissingPermission")
-    private val speechRecognizerUtils = SpeechRecognizerUtils(LANGUAGE_CHINESE)
+    val speechRecognizerUtils = SpeechRecognizerUtils(LANGUAGE_CHINESE)
 
     fun startRecognizing() {
         viewModelScope.launch {
